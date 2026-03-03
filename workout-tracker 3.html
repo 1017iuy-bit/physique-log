@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PHYSIQUE LOG</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PHYSIQUE">
+<meta name="theme-color" content="#080808">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23080808'/><text y='68' x='50' text-anchor='middle' font-size='60'>🏋️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080808;--s1:#101010;--s2:#181818;--s3:#222;--border:#2c2c2c;--border2:#383838;--acc:#e8ff47;--acc2:#ff5533;--blue:#38bdf8;--text:#f2f2f2;--muted:#5a5a5a;--muted2:#888}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;background:var(--bg)}
+body{height:100dvh;max-height:100dvh;background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;display:flex;flex-direction:column;overflow:hidden}
+.hdr{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 18px 10px;border-bottom:1px solid var(--border);background:var(--bg)}
+.hdr-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;letter-spacing:4px;color:var(--acc)}
+.hdr-logo em{color:var(--text);font-style:normal}
+.hdr-date{font-size:11px;color:var(--muted2);letter-spacing:.5px}
+.hdr-vol{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--acc);letter-spacing:1px;text-align:right}
+.hdr-vl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:right}
+.tabs{flex-shrink:0;order:10;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);background:var(--s1)}
+.tab{padding:10px 4px 8px;background:none;border:none;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-family:'Noto Sans JP',sans-serif;letter-spacing:.5px;transition:color .15s}
+.tab .ico{font-size:18px;line-height:1}
+.tab.active{color:var(--acc)}
+.body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.page{display:none;min-height:100%}
+.page.active{display:block}
+.log-hero{padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.log-title{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;letter-spacing:3px;line-height:1}
+.log-title span{color:var(--acc)}
+.log-stats{display:flex;gap:14px}
+.ls{text-align:center}
+.ls .v{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--acc)}
+.ls .l{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.sec-head{padding:12px 18px 5px;display:flex;align-items:center;justify-content:space-between}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.log-ex{margin:0 18px 10px;background:var(--s2);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.log-ex.wp{border-left:3px solid var(--acc2)}
+.log-ex.pr{border-left:3px solid var(--blue)}
+.ex-head{padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.ex-nm{font-size:13px;font-weight:700;line-height:1.2;flex:1}
+.ex-tags{display:flex;gap:5px;align-items:center;flex-shrink:0}
+.bdg{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px}
+.bdg-wp{background:rgba(255,85,51,.15);color:var(--acc2);border:1px solid rgba(255,85,51,.4)}
+.bdg-pr{background:rgba(56,189,248,.12);color:var(--blue);border:1px solid rgba(56,189,248,.35)}
+.bdg-s{background:var(--s3);color:var(--muted2);border:1px solid var(--border2);font-size:9px}
+.log-sets{padding:0 14px 10px}
+.sil-row{display:grid;grid-template-columns:26px 1fr 1fr 36px;gap:6px;padding-bottom:3px}
+.sil{font-size:9px;color:var(--muted);text-align:center;letter-spacing:1px;text-transform:uppercase}
+.set-row{display:grid;grid-template-columns:26px 1fr 1fr 36px;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid rgba(44,44,44,.6)}
+.set-row:last-of-type{border-bottom:none}
+.sn{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-align:center}
+.si{background:var(--s3);border:1px solid var(--border2);color:var(--text);padding:7px 8px;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-align:center;border-radius:2px;width:100%;outline:none;-webkit-appearance:none}
+.si:focus{border-color:var(--acc);color:var(--acc)}
+.si.done{border-color:rgba(232,255,71,.25);color:rgba(232,255,71,.5)}
+.sc{width:36px;height:36px;background:var(--s3);border:1px solid var(--border2);color:var(--muted);font-size:15px;cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
+.sc.chk{background:rgba(232,255,71,.12);border-color:var(--acc);color:var(--acc)}
+.add-set-btn{width:100%;background:none;border:1px dashed var(--border);color:var(--muted);padding:6px;font-size:11px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:2px;margin-top:4px}
+.add-set-btn:active{border-color:var(--acc);color:var(--acc)}
+.save-btn{display:block;width:calc(100% - 36px);margin:8px 18px 24px;background:var(--acc);color:#000;border:none;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:3px;cursor:pointer;border-radius:2px}
+.save-btn:active{transform:scale(.98)}
+.hist-item{margin:10px 18px;background:var(--s2);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.hist-head{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.hist-date{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.5px}
+.hist-date small{font-size:12px;color:var(--muted2);font-weight:400;margin-left:5px}
+.hist-meta{display:flex;gap:12px;align-items:center}
+.hm{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--muted2)}
+.hm strong{color:var(--text);font-size:15px}
+.chev{font-size:11px;color:var(--muted);transition:transform .2s}
+.hist-item.open .chev{transform:rotate(180deg)}
+.hist-body{display:none;padding:0 14px 14px}
+.hist-item.open .hist-body{display:block}
+.hex-name{font-size:12px;font-weight:700;padding:7px 0 3px;border-top:1px solid var(--border);color:var(--muted2)}
+.hex-name:first-child{border-top:none}
+.hchips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{background:var(--s3);border:1px solid var(--border2);padding:4px 9px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:var(--muted2)}
+.chip strong{color:var(--text)}
+.gtabs{display:flex;border-bottom:1px solid var(--border);background:var(--s1);overflow-x:auto;scrollbar-width:none}
+.gtabs::-webkit-scrollbar{display:none}
+.gtab{flex-shrink:0;padding:11px 16px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;transition:color .15s;white-space:nowrap}
+.gtab.active{color:var(--acc);border-bottom-color:var(--acc)}
+.gsec{display:none;padding:14px 18px 28px}
+.gsec.active{display:block}
+.g-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:2px;margin-bottom:2px}
+.g-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+.pbtns{display:flex;gap:6px;margin-bottom:14px}
+.pbtn{padding:5px 14px;border-radius:2px;background:var(--s3);border:1px solid var(--border2);color:var(--muted2);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer}
+.pbtn.active{background:rgba(232,255,71,.1);border-color:var(--acc);color:var(--acc)}
+.chart-box{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:14px 10px 8px;margin-bottom:14px}
+.chart-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+svg.chart{width:100%;overflow:visible;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:10px}
+.leg{display:flex;align-items:center;gap:5px;font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--muted2)}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.exsel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.exbtn{padding:5px 11px;border-radius:2px;background:var(--s3);border:1px solid var(--border2);color:var(--muted2);font-size:11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .12s}
+.exbtn.active{background:rgba(232,255,71,.1);border-color:var(--acc);color:var(--acc)}
+.bal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.bal-item{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:12px;text-align:center}
+.bal-nm{font-size:12px;font-weight:700;margin-bottom:6px}
+.bal-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--acc)}
+.bal-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.cfg-sec{padding:14px 18px}
+.cfg-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.cfg-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.cfg-item{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.cfg-nm{font-size:13px;font-weight:700;flex:1;line-height:1.4}
+.cfg-nm small{font-size:11px;color:var(--muted);font-weight:400}
+.ttog{font-family:'Barlow Condensed',sans-serif;font-size:9px;padding:3px 8px;border-radius:2px;cursor:pointer;letter-spacing:1px;font-weight:700;border:1px solid var(--border2);background:none;color:var(--muted);transition:all .12s}
+.ttog.wp.on{background:rgba(255,85,51,.15);border-color:rgba(255,85,51,.4);color:var(--acc2)}
+.ttog.pr.on{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.35);color:var(--blue)}
+.del-btn{background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:4px}
+.del-btn:active{color:var(--acc2)}
+.add-form{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:14px}
+.af-title{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.af-in{width:100%;background:var(--s3);border:1px solid var(--border2);color:var(--text);padding:10px 12px;font-size:14px;font-family:'Noto Sans JP',sans-serif;outline:none;border-radius:2px;margin-bottom:8px}
+.af-in:focus{border-color:var(--acc)}
+.af-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.af-sel{background:var(--s3);border:1px solid var(--border2);color:var(--text);padding:10px 12px;font-size:13px;outline:none;border-radius:2px;width:100%;font-family:'Noto Sans JP',sans-serif;-webkit-appearance:none;cursor:pointer}
+.af-tags{display:flex;gap:6px;margin-bottom:10px}
+.af-tag{flex:1;padding:8px;border-radius:2px;background:var(--s3);border:1px solid var(--border2);color:var(--muted);font-size:11px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;transition:all .12s}
+.af-tag.on{border-color:var(--acc);color:var(--acc);background:rgba(232,255,71,.08)}
+.af-tag.on-wp{border-color:var(--acc2);color:var(--acc2);background:rgba(255,85,51,.08)}
+.af-tag.on-pr{border-color:var(--blue);color:var(--blue);background:rgba(56,189,248,.08)}
+.af-sub{width:100%;background:var(--acc);color:#000;border:none;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:3px;cursor:pointer;border-radius:2px}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s2);border:1px solid var(--acc);color:var(--acc);padding:9px 18px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:2px;opacity:0;transition:all .25s;pointer-events:none;z-index:500;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.w-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.wstat{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:10px 12px;text-align:center}
+.wstat .wv{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:900;letter-spacing:1px}
+.wstat .wl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.wstat.up .wv{color:var(--acc)}
+.wstat.down .wv{color:#ff5533}
+.wstat.neu .wv{color:var(--muted2)}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div><div class="hdr-logo">PHYSIQUE <em>LOG</em></div><div class="hdr-date" id="hdr-date"></div></div>
+  <div><div class="hdr-vol" id="hdr-vol">0 kg</div><div class="hdr-vl">本日のボリューム</div></div>
+</div>
+<div class="body">
+  <!-- LOG -->
+  <div class="page active" id="page-log">
+    <div class="log-hero">
+      <div class="log-title">本日の<span>トレーニング</span></div>
+      <div class="log-stats">
+        <div class="ls"><div class="v" id="ls-sets">0</div><div class="l">セット</div></div>
+        <div class="ls"><div class="v" id="ls-vol">0</div><div class="l">ボリューム</div></div>
+      </div>
+    </div>
+    <div id="log-wrap"></div>
+    <button class="save-btn" onclick="saveSession()">✓ セッション保存</button>
+  </div>
+  <!-- HISTORY -->
+  <div class="page" id="page-hist">
+    <div style="padding:14px 18px 8px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:3px">記録一覧</div><div style="font-size:11px;color:var(--muted);margin-top:2px">過去のセッション記録</div></div>
+    <div id="hist-list"></div>
+  </div>
+  <!-- GRAPH -->
+  <div class="page" id="page-graph">
+    <div class="gtabs">
+      <button class="gtab active" onclick="showGraph('vol',this)">ボリューム推移</button>
+      <button class="gtab" onclick="showGraph('weight',this)">重量の伸び</button>
+      <button class="gtab" onclick="showGraph('balance',this)">部位バランス</button>
+    </div>
+    <div class="gsec active" id="gs-vol">
+      <div class="g-title" style="margin-top:14px">ボリューム推移</div>
+      <div class="g-sub">部位別ボリューム推移（kg）</div>
+      <div class="pbtns">
+        <button class="pbtn active" onclick="setPeriod('week',this)">週</button>
+        <button class="pbtn" onclick="setPeriod('month',this)">月</button>
+      </div>
+      <div class="chart-box">
+        <div class="chart-lbl">ボリューム / セッション</div>
+        <svg class="chart" id="vol-svg" height="180"></svg>
+        <div class="legend" id="vol-leg"></div>
+      </div>
+    </div>
+    <div class="gsec" id="gs-weight">
+      <div class="g-title" style="margin-top:14px">重量の伸び</div>
+      <div class="g-sub">種目別・最大重量と伸び率の推移</div>
+      <div class="exsel" id="ex-sel"></div>
+      <div id="w-stats" class="w-stats-row"></div>
+      <div class="chart-box">
+        <div class="chart-lbl" id="w-lbl">最大重量の推移（kg）</div>
+        <svg class="chart" id="w-svg" height="180"></svg>
+      </div>
+      <div class="chart-box" style="margin-top:0">
+        <div class="chart-lbl">伸び率（初回比 %）</div>
+        <svg class="chart" id="w-rate-svg" height="120"></svg>
+      </div>
+    </div>
+    <div class="gsec" id="gs-balance">
+      <div class="g-title" style="margin-top:14px">部位バランス</div>
+      <div class="g-sub">部位別ボリューム構成比（直近4セッション）</div>
+      <div class="chart-box" style="display:flex;align-items:center;justify-content:center;padding:16px">
+        <svg id="donut" width="180" height="180" viewBox="0 0 200 200"></svg>
+      </div>
+      <div class="bal-grid" id="bal-grid"></div>
+    </div>
+  </div>
+  <!-- CONFIG -->
+  <div class="page" id="page-cfg">
+    <div class="cfg-sec">
+      <div class="cfg-title">種目管理</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button onclick="exportData()" style="flex:1;padding:9px;background:var(--s3);border:1px solid var(--border2);color:var(--muted2);font-size:11px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;cursor:pointer;border-radius:2px">📤 データ書き出し</button>
+        <button onclick="document.getElementById('importFile').click()" style="flex:1;padding:9px;background:var(--s3);border:1px solid var(--border2);color:var(--muted2);font-size:11px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;cursor:pointer;border-radius:2px">📥 データ読み込み</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
+      </div>
+      <div class="cfg-list" id="cfg-list"></div>
+      <div class="add-form">
+        <div class="af-title">種目を追加</div>
+        <input class="af-in" id="af-name" type="text" placeholder="種目名">
+        <div class="af-row">
+          <select class="af-sel" id="af-muscle"><option value="chest">胸</option><option value="back">背中</option><option value="shoulder_front">肩（フロント）</option><option value="shoulder_side">肩（サイド）</option><option value="shoulder_rear">肩（リア）</option><option value="arm">腕</option><option value="leg">脚</option><option value="abs">腹筋</option></select>
+          <select class="af-sel" id="af-sets"><option value="3">3セット</option><option value="4">4セット</option><option value="5">5セット</option><option value="6">6セット</option></select>
+        </div>
+        <div class="af-tags">
+          <button class="af-tag on" data-tag="" onclick="afTag(this)">なし</button>
+          <button class="af-tag" data-tag="weak" onclick="afTag(this)">弱点</button>
+          <button class="af-tag" data-tag="prime" onclick="afTag(this)">プライミング</button>
+        </div>
+        <button class="af-sub" onclick="addEx()">追加する</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab active" id="tab-log" onclick="showPage('log')"><span class="ico">🏋️</span>今日</button>
+  <button class="tab" id="tab-hist" onclick="showPage('hist')"><span class="ico">📋</span>記録</button>
+  <button class="tab" id="tab-graph" onclick="showPage('graph')"><span class="ico">📈</span>グラフ</button>
+  <button class="tab" id="tab-cfg" onclick="showPage('cfg')"><span class="ico">⚙️</span>設定</button>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const MC={chest:'胸',back:'背中',shoulder_front:'肩（フロント）',shoulder_side:'肩（サイド）',shoulder_rear:'肩（リア）',arm:'腕',leg:'脚',abs:'腹筋'};
+const MU=['chest','back','shoulder_front','shoulder_side','shoulder_rear','arm','leg','abs'];
+const MCL={chest:'#ff5533',back:'#38bdf8',shoulder_front:'#facc15',shoulder_side:'#4ade80',shoulder_rear:'#fb923c',arm:'#a78bfa',leg:'#f472b6',abs:'#34d399'};
+let exercises=[
+  {id:'e1',name:'インクラインDBプレス',muscle:'chest',ds:7,tag:'weak'},
+  {id:'e2',name:'インクラインMCプレス',muscle:'chest',ds:6,tag:''},
+  {id:'e3',name:'ケーブルフライ（中部）',muscle:'chest',ds:4,tag:''},
+  {id:'e4',name:'MCプレス（フラット）',muscle:'chest',ds:4,tag:''},
+  {id:'e5',name:'ストレートアームプルダウン',muscle:'back',ds:4,tag:'prime'},
+  {id:'e6',name:'ニュートラルラットプルダウン',muscle:'back',ds:8,tag:'weak'},
+  {id:'e7',name:'ワンハンドロー',muscle:'back',ds:3,tag:''},
+  {id:'e8',name:'ケーブルロー',muscle:'back',ds:4,tag:''},
+  {id:'e9',name:'ベントオーバーロウ',muscle:'back',ds:4,tag:''},
+  {id:'e10',name:'MCショルダープレス',muscle:'shoulder_front',ds:7,tag:''},
+  {id:'e11',name:'バーベルショルダープレス',muscle:'shoulder_front',ds:4,tag:''},
+  {id:'e12',name:'フロントレイズ',muscle:'shoulder_front',ds:6,tag:''},
+  {id:'e13',name:'リアレイズ',muscle:'shoulder_rear',ds:8,tag:''},
+  {id:'e14',name:'リアデルトイド',muscle:'shoulder_rear',ds:7,tag:''},
+  {id:'e14b',name:'サイドレイズ',muscle:'shoulder_side',ds:4,tag:''},
+  {id:'e15',name:'バーベルカール',muscle:'arm',ds:5,tag:''},
+  {id:'e16',name:'インクラインDBカール',muscle:'arm',ds:3,tag:''},
+  {id:'e17',name:'プリーチャーカール',muscle:'arm',ds:3,tag:''},
+  {id:'e18',name:'ケーブルハンマーカール',muscle:'arm',ds:4,tag:''},
+  {id:'e19',name:'ケーブルオーバーヘッド',muscle:'arm',ds:4,tag:''},
+  {id:'e20',name:'スミスナローベンチ',muscle:'arm',ds:4,tag:''},
+  {id:'e21',name:'ケーブルプッシュダウン',muscle:'arm',ds:4,tag:''},
+  {id:'e22',name:'スクワット',muscle:'leg',ds:4,tag:''},
+  {id:'e23',name:'レッグプレス',muscle:'leg',ds:4,tag:''},
+  {id:'e24',name:'レッグカール',muscle:'leg',ds:4,tag:''},
+  {id:'e25',name:'レッグエクステンション',muscle:'leg',ds:3,tag:''},
+  {id:'e26',name:'カーフレイズ',muscle:'leg',ds:4,tag:''},
+  {id:'e27',name:'クランチ',muscle:'abs',ds:3,tag:''},
+  {id:'e28',name:'レッグレイズ',muscle:'abs',ds:3,tag:''},
+  {id:'e29',name:'プランク',muscle:'abs',ds:3,tag:''},
+];
+let todayLog=[];
+let sessions=genSessions();
+let period='week';
+let selEx=null;
+let curGraph='vol';
+
+function fmtK(n){return n>=1000?(n/1000).toFixed(1)+'k':n}
+function vol(sets){return sets.reduce((s,x)=>s+(+(x.w||0))*(+(x.r||0)),0)}
+function exById(id){return exercises.find(e=>e.id===id)}
+function uid(){return 'ex'+Date.now()+Math.random().toString(36).slice(2,5)}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function fmtDt(d){return new Date(d).toLocaleDateString('ja-JP',{month:'short',day:'numeric',weekday:'short'})}
+
+function genSessions(){
+  const base=[
+    {id:'e1',ref:[{w:28,r:6},{w:28,r:6},{w:28,r:6},{w:24,r:8},{w:24,r:8},{w:24,r:8},{w:24,r:8}]},
+    {id:'e2',ref:[{w:80,r:8},{w:80,r:8},{w:80,r:8},{w:70,r:10},{w:70,r:10},{w:70,r:10}]},
+    {id:'e5',ref:[{w:15,r:15},{w:15,r:15},{w:15,r:15},{w:15,r:15}]},
+    {id:'e6',ref:[{w:90,r:5},{w:90,r:5},{w:90,r:5},{w:80,r:9},{w:80,r:9},{w:80,r:9},{w:80,r:9},{w:80,r:9}]},
+    {id:'e10',ref:[{w:120,r:4},{w:120,r:4},{w:120,r:4},{w:100,r:8},{w:100,r:8},{w:100,r:8},{w:100,r:8}]},
+    {id:'e13',ref:[{w:68,r:6},{w:68,r:6},{w:68,r:6},{w:68,r:6},{w:60,r:10},{w:60,r:10},{w:60,r:10},{w:60,r:10}]},
+    {id:'e15',ref:[{w:45,r:6},{w:45,r:6},{w:45,r:6},{w:40,r:8},{w:40,r:6}]},
+    {id:'e19',ref:[{w:40,r:10},{w:40,r:10},{w:40,r:10},{w:40,r:10}]},
+  ];
+  const now=new Date();const s=[];
+  for(let w=7;w>=0;w--){
+    const dt=new Date(now);dt.setDate(dt.getDate()-w*7);
+    const f=1+((7-w)*0.04);
+    s.push({date:dt.toISOString().slice(0,10),entries:base.map(e=>({exId:e.id,sets:e.ref.map(r=>({w:Math.round(r.w*f*2)/2,r:r.r}))}))});
+    if(w>0){const dt2=new Date(dt);dt2.setDate(dt2.getDate()+3);const f2=f+0.01;s.push({date:dt2.toISOString().slice(0,10),entries:base.slice(0,5).map(e=>({exId:e.id,sets:e.ref.map(r=>({w:Math.round(r.w*f2*2)/2,r:r.r}))}))});}
+  }
+  return s.sort((a,b)=>b.date.localeCompare(a.date));
+}
+
+// ── PAGES ──
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('tab-'+p).classList.add('active');
+  if(p==='hist')renderHist();
+  if(p==='graph')renderGraphs();
+  if(p==='cfg')renderCfg();
+}
+
+// ── LOG ──
+function initLog(){
+  todayLog=exercises.map(ex=>({exId:ex.id,sets:Array.from({length:ex.ds},()=>({w:'',r:'',done:false}))}));
+  renderLog();
+}
+function renderLog(){
+  let h='';
+  MU.forEach(m=>{
+    const exs=exercises.filter(e=>e.muscle===m);
+    if(!exs.length)return;
+    h+=`<div class="sec-head"><div class="sec-title" style="color:${MCL[m]}">${MC[m]}</div></div>`;
+    exs.forEach(ex=>{
+      const ent=todayLog.find(l=>l.exId===ex.id);if(!ent)return;
+      const dn=ent.sets.filter(s=>s.done).length,tot=ent.sets.length;
+      const wb=ex.tag==='weak'?'<span class="bdg bdg-wp">弱点</span>':ex.tag==='prime'?'<span class="bdg bdg-pr">プライミング</span>':'';
+      h+=`<div class="log-ex ${ex.tag==='weak'?'wp':''} ${ex.tag==='prime'?'pr':''}" id="lex-${ex.id}">
+        <div class="ex-head"><div class="ex-nm">${ex.name}</div><div class="ex-tags">${wb}<span class="bdg bdg-s" id="bs-${ex.id}">${dn}/${tot}</span></div></div>
+        <div class="log-sets">
+          <div class="sil-row"><div class="sil"></div><div class="sil">重量kg</div><div class="sil">Rep</div><div class="sil"></div></div>
+          ${ent.sets.map((s,i)=>`<div class="set-row" id="sr-${ex.id}-${i}"><div class="sn">${i+1}</div><input class="si${s.done?' done':''}" type="number" inputmode="decimal" placeholder="—" value="${s.w}" onchange="sv('${ex.id}',${i},'w',this.value)"><input class="si${s.done?' done':''}" type="number" inputmode="numeric" placeholder="—" value="${s.r}" onchange="sv('${ex.id}',${i},'r',this.value)"><button class="sc${s.done?' chk':''}" onclick="td('${ex.id}',${i})">✓</button></div>`).join('')}
+          <button class="add-set-btn" onclick="addSet('${ex.id}')">＋ セット追加</button>
+        </div></div>`;
+    });
+  });
+  document.getElementById('log-wrap').innerHTML=h;
+  updStats();
+}
+function sv(exId,si,k,v){const e=todayLog.find(l=>l.exId===exId);if(e)e.sets[si][k]=parseFloat(v)||0;updStats();saveToLS()}
+function td(exId,si){
+  const e=todayLog.find(l=>l.exId===exId);if(!e)return;
+  e.sets[si].done=!e.sets[si].done;
+  const row=document.getElementById(`sr-${exId}-${si}`);
+  const chk=row.querySelector('.sc');const inps=row.querySelectorAll('.si');const isDone=e.sets[si].done;
+  chk.classList.toggle('chk',isDone);inps.forEach(i=>i.classList.toggle('done',isDone));
+  const b=document.getElementById('bs-'+exId);
+  if(b)b.textContent=`${e.sets.filter(s=>s.done).length}/${e.sets.length}`;
+  updStats();
+  saveToLS();
+}
+function addSet(exId){
+  const e=todayLog.find(l=>l.exId===exId);if(!e)return;
+  const last=e.sets[e.sets.length-1];
+  e.sets.push({w:last?last.w:'',r:last?last.r:'',done:false});
+  renderLog();
+}
+function updStats(){
+  let ts=0,tv=0;
+  todayLog.forEach(e=>{const d=e.sets.filter(s=>s.done);ts+=d.length;tv+=d.reduce((a,x)=>a+(+x.w)*(+x.r),0)});
+  document.getElementById('ls-sets').textContent=ts;
+  document.getElementById('ls-vol').textContent=fmtK(tv);
+  document.getElementById('hdr-vol').textContent=fmtK(tv)+' kg';
+}
+function saveSession(){
+  const ds=new Date().toISOString().slice(0,10);
+  const entries=[];
+  todayLog.forEach(e=>{const vs=e.sets.filter(s=>s.done&&s.w&&s.r);if(vs.length)entries.push({exId:e.exId,sets:vs.map(s=>({w:+s.w,r:+s.r}))})});
+  if(!entries.length){toast('チェックされたセットがありません');return;}
+  sessions=sessions.filter(s=>s.date!==ds);
+  sessions.unshift({date:ds,entries});
+  sessions.sort((a,b)=>b.date.localeCompare(a.date));
+  saveToLS();
+  toast('✓ セッション保存完了！');
+}
+
+// ── HISTORY ──
+function renderHist(){
+  const list=document.getElementById('hist-list');
+  if(!sessions.length){list.innerHTML='<div style="padding:40px 18px;color:var(--muted);font-size:13px;text-align:center">記録がありません</div>';return;}
+  list.innerHTML=sessions.map((s,i)=>{
+    const tv=s.entries.reduce((a,e)=>a+vol(e.sets),0);
+    const ts=s.entries.reduce((a,e)=>a+e.sets.length,0);
+    const body=s.entries.map(e=>{const ex=exById(e.exId);if(!ex)return '';return `<div class="hex-name">${ex.name}</div><div class="hchips">${e.sets.map(st=>`<div class="chip"><strong>${st.w}</strong>×${st.r}</div>`).join('')}</div>`;}).join('');
+    return `<div class="hist-item" id="hi-${i}"><div class="hist-head" onclick="tgHist(${i})"><div><div class="hist-date">${fmtDt(s.date)}<small>${s.date}</small></div></div><div class="hist-meta"><div class="hm"><strong>${fmtK(tv)}</strong>kg</div><div class="hm"><strong>${ts}</strong>セット</div><div class="chev">▼</div></div></div><div class="hist-body">${body}</div></div>`;
+  }).join('');
+}
+function tgHist(i){document.getElementById('hi-'+i).classList.toggle('open')}
+
+// ── GRAPHS ──
+function showGraph(g,btn){
+  curGraph=g;
+  document.querySelectorAll('.gtab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.gsec').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('gs-'+g).classList.add('active');
+  drawGraph();
+}
+function setPeriod(p,btn){period=p;document.querySelectorAll('.pbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');drawVolChart()}
+function renderGraphs(){drawGraph()}
+function drawGraph(){if(curGraph==='vol')drawVolChart();else if(curGraph==='weight')drawWeightChart();else drawBalance()}
+
+function getSessions(){
+  const now=new Date(),cut=new Date(now);
+  if(period==='week')cut.setDate(cut.getDate()-56);else cut.setDate(cut.getDate()-180);
+  return sessions.filter(s=>new Date(s.date)>=cut).slice().reverse();
+}
+
+function drawVolChart(){
+  const el=document.getElementById('vol-svg');
+  const W=el.getBoundingClientRect().width||300,H=180;
+  const p={t:10,r:8,b:28,l:40};
+  const cw=W-p.l-p.r,ch=H-p.t-p.b;
+  const sess=getSessions();
+  if(sess.length<2){el.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#555" font-size="12" font-family="'Barlow Condensed',sans-serif">データ不足</text>`;return}
+  const pts={};MU.forEach(m=>{pts[m]=[]});
+  sess.forEach(s=>{MU.forEach(m=>{const v=s.entries.filter(e=>exById(e.exId)?.muscle===m).reduce((a,e)=>a+vol(e.sets),0);pts[m].push({date:s.date,v})})});
+  const allV=Object.values(pts).flat().map(p=>p.v);
+  const maxV=Math.max(...allV,1),n=pts[MU[0]].length;
+  const xp=i=>p.l+(i/(n-1||1))*cw,yp=v=>p.t+ch-((v)/(maxV||1))*ch;
+  let svg=`<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
+  [0,.25,.5,.75,1].forEach(f=>{const y=p.t+ch*f;const val=Math.round(maxV*(1-f));svg+=`<line x1="${p.l}" y1="${y}" x2="${p.l+cw}" y2="${y}" stroke="#1e1e1e" stroke-width="1"/>`;svg+=`<text x="${p.l-4}" y="${y+4}" text-anchor="end" fill="#444" font-size="9" font-family="'Barlow Condensed',sans-serif">${fmtK(val)}</text>`;});
+  const step=Math.max(1,Math.floor(n/5));
+  pts[MU[0]].forEach((pt,i)=>{if(i%step===0){const d=new Date(pt.date);svg+=`<text x="${xp(i)}" y="${H-4}" text-anchor="middle" fill="#444" font-size="9" font-family="'Barlow Condensed',sans-serif">${d.getMonth()+1}/${d.getDate()}</text>`}});
+  MU.forEach(m=>{
+    const mp=pts[m];if(!mp.length)return;const c=MCL[m];
+    let ar=`M ${xp(0)} ${yp(0)}`;mp.forEach((pt,i)=>{ar+=` L ${xp(i)} ${yp(pt.v)}`});ar+=` L ${xp(mp.length-1)} ${p.t+ch} L ${xp(0)} ${p.t+ch} Z`;
+    svg+=`<path d="${ar}" fill="${c}" fill-opacity="0.07"/>`;
+    let ln=`M ${xp(0)} ${yp(mp[0].v)}`;mp.forEach((pt,i)=>{if(i>0)ln+=` L ${xp(i)} ${yp(pt.v)}`});
+    svg+=`<path d="${ln}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    mp.forEach((pt,i)=>{if(pt.v>0)svg+=`<circle cx="${xp(i)}" cy="${yp(pt.v)}" r="3" fill="${c}"/>`});
+  });
+  svg+='</svg>';
+  el.outerHTML=svg;
+  document.getElementById('vol-leg').innerHTML=MU.map(m=>`<div class="leg"><div class="leg-dot" style="background:${MCL[m]}"></div>${MC[m]}</div>`).join('');
+}
+
+function buildExSel(){
+  const sel=document.getElementById('ex-sel');
+  if(sel.children.length)return;
+  if(!selEx&&exercises.length)selEx=exercises[0].id;
+  sel.innerHTML=exercises.map(ex=>`<button class="exbtn${selEx===ex.id?' active':''}" onclick="selExFn('${ex.id}',this)">${ex.name}</button>`).join('');
+}
+function selExFn(id,btn){selEx=id;document.querySelectorAll('.exbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');drawWeightChart()}
+
+function drawWeightChart(){
+  buildExSel();
+  if(!selEx)return;
+  const ex=exById(selEx);
+  const pts=sessions.slice().reverse().map(s=>{const e=s.entries.find(e=>e.exId===selEx);if(!e)return null;return{date:s.date,w:Math.max(...e.sets.map(s=>s.w))}}).filter(Boolean);
+  const lbl=document.getElementById('w-lbl');if(lbl)lbl.textContent=(ex?ex.name:'')+'  最大重量';
+  const el=document.getElementById('w-svg');
+  const W=el.getBoundingClientRect().width||300,H=180;
+  const pd={t:10,r:8,b:28,l:40};
+  const cw=W-pd.l-pd.r,ch=H-pd.t-pd.b;
+  if(pts.length<2){el.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#555" font-size="12" font-family="'Barlow Condensed',sans-serif">データ不足</text>`;return}
+  const maxW=Math.max(...pts.map(p=>p.w)),minW=Math.min(...pts.map(p=>p.w))*0.95;
+  const n=pts.length,xp=i=>pd.l+(i/(n-1||1))*cw,yp=v=>pd.t+ch-((v-minW)/(maxW-minW||1))*ch;
+  const c='#e8ff47';
+  let svg=`<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
+  [0,.25,.5,.75,1].forEach(f=>{const y=pd.t+ch*f;const v=minW+(maxW-minW)*(1-f);svg+=`<line x1="${pd.l}" y1="${y}" x2="${pd.l+cw}" y2="${y}" stroke="#1e1e1e" stroke-width="1"/>`;svg+=`<text x="${pd.l-4}" y="${y+4}" text-anchor="end" fill="#444" font-size="9" font-family="'Barlow Condensed',sans-serif">${Math.round(v)}</text>`;});
+  const step=Math.max(1,Math.floor(n/5));
+  pts.forEach((pt,i)=>{if(i%step===0){const d=new Date(pt.date);svg+=`<text x="${xp(i)}" y="${H-4}" text-anchor="middle" fill="#444" font-size="9" font-family="'Barlow Condensed',sans-serif">${d.getMonth()+1}/${d.getDate()}</text>`}});
+  let ar=`M ${xp(0)} ${yp(pts[0].w)}`;pts.forEach((pt,i)=>{ar+=` L ${xp(i)} ${yp(pt.w)}`});ar+=` L ${xp(n-1)} ${pd.t+ch} L ${xp(0)} ${pd.t+ch} Z`;
+  svg+=`<path d="${ar}" fill="${c}" fill-opacity="0.09"/>`;
+  let ln=`M ${xp(0)} ${yp(pts[0].w)}`;pts.forEach((pt,i)=>{if(i>0)ln+=` L ${xp(i)} ${yp(pt.w)}`});
+  svg+=`<path d="${ln}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  pts.forEach((pt,i)=>{svg+=`<circle cx="${xp(i)}" cy="${yp(pt.w)}" r="3.5" fill="${c}"/>`});
+  const mi=pts.reduce((a,b,i)=>b.w>pts[a].w?i:a,0);
+  svg+=`<rect x="${xp(mi)-18}" y="${yp(pts[mi].w)-22}" width="38" height="17" rx="2" fill="#1a1f00"/>`;
+  svg+=`<text x="${xp(mi)}" y="${yp(pts[mi].w)-8}" text-anchor="middle" fill="${c}" font-size="11" font-weight="700" font-family="'Barlow Condensed',sans-serif">${pts[mi].w}kg</text>`;
+  svg+='</svg>';el.outerHTML=svg;
+}
+
+function drawBalance(){
+  const vols={};
+  MU.forEach(m=>{vols[m]=sessions.slice(0,4).reduce((a,s)=>a+s.entries.filter(e=>exById(e.exId)?.muscle===m).reduce((b,e)=>b+vol(e.sets),0),0)});
+  const tot=Object.values(vols).reduce((a,b)=>a+b,0)||1;
+  const cx=100,cy=100,r=80,ir=54;let sa=-Math.PI/2,paths='';
+  MU.forEach(m=>{
+    const pct=vols[m]/tot,ang=pct*Math.PI*2,ea=sa+ang;
+    const x1=cx+r*Math.cos(sa),y1=cy+r*Math.sin(sa),x2=cx+r*Math.cos(ea),y2=cy+r*Math.sin(ea);
+    const ix1=cx+ir*Math.cos(sa),iy1=cy+ir*Math.sin(sa),ix2=cx+ir*Math.cos(ea),iy2=cy+ir*Math.sin(ea);
+    const lg=ang>Math.PI?1:0;
+    paths+=`<path d="M ${ix1} ${iy1} L ${x1} ${y1} A ${r} ${r} 0 ${lg} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ir} ${ir} 0 ${lg} 0 ${ix1} ${iy1} Z" fill="${MCL[m]}" fill-opacity=".85"/>`;
+    sa=ea;
+  });
+  paths+=`<circle cx="${cx}" cy="${cy}" r="${ir}" fill="var(--s2)"/>`;
+  paths+=`<text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#666" font-size="10" font-family="'Barlow Condensed',sans-serif">バランス</text>`;
+  document.getElementById('donut').innerHTML=paths;
+  document.getElementById('bal-grid').innerHTML=MU.map(m=>{const p=Math.round(vols[m]/tot*100);return`<div class="bal-item"><div class="bal-nm" style="color:${MCL[m]}">${MC[m]}</div><div class="bal-val">${p}%</div><div class="bal-sub">${fmtK(Math.round(vols[m]/4))} kg/回</div></div>`}).join('');
+}
+
+// ── CONFIG ──
+function renderCfg(){
+  document.getElementById('cfg-list').innerHTML=exercises.map((ex,i)=>`<div class="cfg-item"><div class="cfg-nm">${ex.name}<br><small>${MC[ex.muscle]} / ${ex.ds}sets</small></div><div style="display:flex;gap:5px"><button class="ttog wp${ex.tag==='weak'?' on':''}" onclick="tTag(${i},'weak')">弱点</button><button class="ttog pr${ex.tag==='prime'?' on':''}" onclick="tTag(${i},'prime')">プライミング</button></div><button class="del-btn" onclick="delEx(${i})">✕</button></div>`).join('');
+}
+function tTag(i,t){exercises[i].tag=exercises[i].tag===t?'':t;renderCfg();renderLog();saveToLS()}
+function delEx(i){if(!confirm(`「${exercises[i].name}」を削除しますか？`))return;const id=exercises[i].id;exercises.splice(i,1);todayLog=todayLog.filter(l=>exercises.some(e=>e.id===l.exId));document.getElementById('ex-sel').innerHTML='';selEx=null;renderCfg();renderLog();saveToLS()}
+
+let afTagVal='';
+function afTag(btn){
+  afTagVal=btn.dataset.tag;
+  document.querySelectorAll('.af-tag').forEach(b=>{b.className='af-tag'+(b.dataset.tag===afTagVal?' on'+(afTagVal===''?'':afTagVal==='weak'?'-wp':'-pr'):'')});
+}
+document.querySelector('.af-tag').classList.add('on');
+
+function addEx(){
+  const name=document.getElementById('af-name').value.trim();
+  if(!name){toast('種目名を入力してください');return;}
+  const muscle=document.getElementById('af-muscle').value;
+  const ds=parseInt(document.getElementById('af-sets').value);
+  const ex={id:uid(),name,muscle,ds,tag:afTagVal};
+  exercises.push(ex);
+  todayLog.push({exId:ex.id,sets:Array.from({length:ds},()=>({w:'',r:'',done:false}))});
+  document.getElementById('af-name').value='';
+  document.getElementById('ex-sel').innerHTML='';selEx=null;
+  renderCfg();renderLog();saveToLS();toast('✓ 種目を追加しました');
+}
+
+// ── LOCALSTORAGE ──
+const LS_EX='physique_exercises';
+const LS_SESS='physique_sessions';
+const LS_LOG='physique_todaylog';
+const LS_DATE='physique_date';
+
+function saveToLS(){
+  try{
+    localStorage.setItem(LS_EX, JSON.stringify(exercises));
+    localStorage.setItem(LS_SESS, JSON.stringify(sessions));
+    const todayStr=new Date().toISOString().slice(0,10);
+    localStorage.setItem(LS_LOG, JSON.stringify(todayLog));
+    localStorage.setItem(LS_DATE, todayStr);
+  }catch(e){}
+}
+
+function loadFromLS(){
+  try{
+    const ex=localStorage.getItem(LS_EX);
+    if(ex) exercises=JSON.parse(ex);
+    const sess=localStorage.getItem(LS_SESS);
+    if(sess) sessions=JSON.parse(sess);
+    const todayStr=new Date().toISOString().slice(0,10);
+    const savedDate=localStorage.getItem(LS_DATE);
+    const log=localStorage.getItem(LS_LOG);
+    // Only restore today's log if saved today
+    if(log && savedDate===todayStr) todayLog=JSON.parse(log);
+  }catch(e){}
+}
+
+// Auto-save wrapper
+const _origSaveSession=saveSession;
+
+// ── EXPORT / IMPORT ──
+function exportData(){
+  const blob=new Blob([JSON.stringify({exercises,sessions},null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='physique_log_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+}
+function importData(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.exercises)exercises=d.exercises;
+      if(d.sessions)sessions=d.sessions;
+      todayLog=[];
+      initLog();
+      renderCfg();
+      document.getElementById('ex-sel').innerHTML='';selEx=null;
+      saveToLS();
+      toast('✓ データを読み込みました');
+    }catch(err){toast('読み込みに失敗しました');}
+  };
+  reader.readAsText(file);
+}
+
+// ── INIT ──
+(function(){
+  const now=new Date();
+  document.getElementById('hdr-date').textContent=now.toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
+  loadFromLS();
+  if(!todayLog.length) initLog();
+  else renderLog();
+  window.addEventListener('resize',()=>renderGraphs());
+})();
+</script>
+</body>
+</html>
